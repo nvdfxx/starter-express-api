@@ -1,237 +1,61 @@
-var request = require("fetch").fetchUrl;
-var moment = require("moment");
-var md5 = require("md5");
-var c = require("./constants");
+const moment = require("moment");
+const md5 = require("md5");
 
-module.exports = class API {
-  constructor(devId, authKey, format, lang) {
-    !devId ? console.log("Error: No devId specified.") : (this.devId = devId);
-    !authKey
-      ? console.log("Error: No authKey specified.")
-      : (this.authKey = authKey);
-    !format ? (this.format = "Json") : (this.format = c[format]);
-    !lang ? (this.lang = "1") : (this.lang = c[lang]);
-  }
-
-  getFormat(send) {
-    send(this.format);
-  }
-
-  getLanguage(send) {
-    send(this.lang);
-  }
-
-  setLanguage(lang) {
-    this.lang = c[lang];
-  }
-
-  setFormat(format) {
-    this.format = c[format];
-  }
-
-  getPlayer(session, player, send) {
-    var method = "getplayer";
-    var url = this.urlBuilder(session, method, player);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getPlayerStatus(session, player, send) {
-    var method = "getplayerstatus";
-    var url = this.urlBuilder(session, method, player);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getMatchHistory(session, player, send) {
-    var method = "getmatchhistory";
-    var url = this.urlBuilder(session, method, player);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getMatchDetails(session, match_id, send) {
-    var method = "getmatchdetails";
-    var url = this.urlBuilder(session, method, null, null, match_id);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getChampions(session, send) {
-    var method = "getchampions";
-    var url = this.urlBuilder(session, method, null, this.lang);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getChampionRanks(session, player, send) {
-    var method = "getchampionranks";
-    var url = this.urlBuilder(session, method, player);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getChampionSkins(session, champ_id, send) {
-    var method = "getchampionskins";
-    var url = this.urlBuilder(session, method, null, this.lang, null, champ_id);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  //Currently returns an empty object. Don't know why.
-  getChampionRecommendedItems(session, champ_id, send) {
-    var method = "getchampionrecommendeditems";
-    var url = this.urlBuilder(session, method, null, this.lang, null, champ_id);
-    request(url, function(err, res, body) {
-      if (!err) {
-        var bodyParsed = JSON.parse(body);
-        send(err, bodyParsed);
-      }
-    });
-  }
-
-  getDemoDetails(session, match_id, send) {
-    var method = "getdemodetails";
-    var url = this.urlBuilder(session, method, null, null, match_id);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getQueueStats(session, player, queue, match_id, send) {
-    var method = "getqueuestats";
-    var url = this.urlBuilder(session, method, player, null, null, null, queue);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getItems(session, send) {
-    var method = "getitems";
-    var url = this.urlBuilder(session, method, null, this.lang);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getDataUsed(session, send) {
-    var method = "getdataused";
-    var url = this.urlBuilder(session, method);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getPlayerLoadouts(session, player, send) {
-    var method = "getplayerloadouts";
-    var url = this.urlBuilder(session, method, player);
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  getLeagueLeaderboard(session, queue, tier, season, send) {
-    var method = "getleagueleaderboard";
-    var url = this.urlBuilder(
-      session,
-      method,
-      null,
-      null,
-      null,
-      null,
-      queue,
-      tier,
-      season
-    );
-    this.makeRequest(url, (err, data) => {
-      send(err, data);
-    });
-  }
-
-  connect(send) {
-    var url =
-      c.PC +
-      "/" +
-      "createsession" +
-      this.format +
-      "/" +
-      this.devId +
-      "/" +
-      this.getSignature("createsession") +
-      "/" +
-      this.timeStamp();
-    this.makeRequest(url, (err, data) => {
-      send(err, data.session_id);
-    });
-  }
-
-  makeRequest(url, send) {
-    request(url, function(err, res, body) {
-      // The callback will be invoked with these variables, one should be filled one should be left null.
-      var localError = null,
-        bodyParsed = null;
-      if (!err) {
-        try {
-          bodyParsed = JSON.parse(body);
-        } catch (e) {
-          localError = { error: "Paladins API down.", exception: e };
-        }
-      } else {
-        localError = { error: "Paladins API down.", data: err };
-      }
-      send(localError, bodyParsed);
-    });
-  }
-
-  urlBuilder(
-    session,
-    method,
-    player,
-    lang,
-    match_id,
-    champ_id,
-    queue,
-    tier,
-    season
-  ) {
-    var baseURL =
-      c.PC +
-      "/" +
-      method +
-      this.format +
-      "/" +
-      this.devId +
-      "/" +
-      this.getSignature(method) +
-      "/" +
-      session +
-      "/" +
-      this.timeStamp();
-
-    player ? (baseURL += "/" + player) : null;
-    champ_id ? (baseURL += "/" + champ_id) : null;
-    lang ? (baseURL += "/" + lang) : null;
-    match_id ? (baseURL += "/" + match_id) : null;
-    queue ? (baseURL += "/" + queue) : null;
-    tier ? (baseURL += "/" + tier) : null;
-    season ? (baseURL += "/" + season) : null;
-    return baseURL;
-  }
-
-  timeStamp() {
+function timeStamp() {
     return moment()
       .utc()
       .format("YYYYMMDDHHmmss");
-  }
+}
 
-  getSignature(method) {
-    return md5(this.devId + method + this.authKey + this.timeStamp());
-  }
-};
+const URL = 'https://api.paladins.com/paladinsapi.svc'
+
+function getSignature(method) {
+    return md5(`${process.env.DEV_ID}${method}${process.env.AUTH_KEY}${timeStamp()}`)
+}
+
+let SESSION_ID = null
+
+async function getSession() {
+    if(!SESSION_ID) {
+        const url = `${URL}/createsessionJson/${process.env.DEV_ID}/${getSignature('createsession')}/${timeStamp()}`
+        const res = await fetch(url)
+        const parsed = await res.json()
+        //console.log(parsed)
+        SESSION_ID = parsed.session_id
+    }
+    return SESSION_ID
+}
+
+async function getPlayer(nickname) {
+    try {
+        const session_id = await getSession()
+        const url = `${URL}/getplayerjson/${process.env.DEV_ID}/${getSignature('getplayer')}/${session_id}/${timeStamp()}/${nickname}`
+        const res = await fetch(url)
+        const parsed = await res.json()
+        return parsed[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getPlayerMatchHistory(id) {
+    try {
+        const session_id = await getSession()
+        //console.log(player)
+        const url = `${URL}/getmatchhistoryjson/${process.env.DEV_ID}/${getSignature('getmatchhistory')}/${session_id}/${timeStamp()}/${id}`
+        const res = await fetch(url)
+        const parsed = await res.json()
+        const sanitized = parsed.filter(e => e.Queue == 'Ranked').map(e => {
+            const {Kills, Deaths, Win_Status, Assists} = e 
+            return {Kills, Deaths, Win_Status, Assists}
+        })
+        return sanitized
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+module.exports = {
+    getPlayer,
+    getPlayerMatchHistory
+}
