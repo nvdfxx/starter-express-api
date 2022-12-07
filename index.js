@@ -6,7 +6,7 @@ app.all('/', (req, res) => {
 })
 
 app.get('/test', (req, res) => {
-    return api.getPlayer('Tzzunami').then(r => res.send(r))
+    res.send('Yo3!')
 })
 
 app.listen(process.env.PORT || 3000, () => console.log('started'))
