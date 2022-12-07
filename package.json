@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/cyclic-software/starter-express-api#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "fetch": "^1.1.0",
+    "md5": "^2.2.1",
+    "moment": "^2.17.1"
   }
 }
