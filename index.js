@@ -4,4 +4,21 @@ app.all('/', (req, res) => {
     console.log("Just got a request!")
     res.send('Yo2!')
 })
-app.listen(process.env.PORT || 3000)
+
+const paladinsJS = require('paladins.js')
+
+const api = new paladinsJS.API({
+    devId: process.env.DEV_ID,
+    authKey: process.env.AUTH_KEY
+});
+
+
+
+app.get('/test', async (req, res) => {
+
+    const player = await api.getPlayer('Tzzunami')
+    res.send(player)
+
+})
+
+app.listen(process.env.PORT || 3000, () => console.log('started'))
