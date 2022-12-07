@@ -14,10 +14,9 @@ const api = new paladinsJS.API({
 
 
 
-app.get('/test', async (req, res) => {
+app.get('/test', (req, res) => {
 
-    const player = await api.getPlayer('Tzzunami')
-    res.send(player)
+    return api.getPlayer('Tzzunami').then(r => res.send(r))
 
 })
 
