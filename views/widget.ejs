@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+
+  <title>Paladins Stream Helper</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wr__wrapper {
+      display: flex;
+      max-width: 200px;
+      background: rgb(0 0 0 / 10%);
+      border-radius: 10px;
+      justify-content: center;
+      font-size: 60px;
+      font-family: 'Ubuntu', sans-serif;
+      font-weight: 300
+    }
+
+    .wr__item {
+      padding: 20px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      width: 28px;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .wr__item--rank {
+      padding: 17px 5px 5px;
+    }
+
+    .wr-rank__item--img {
+      display: flex;
+    }
+
+    .wr-rank__item--img img {
+      width: 40px; 
+      height: 40px;
+    }
+
+    .wr-rank__item--tp {
+      font-size: 14px;
+      width: 50px;
+      text-align: center;
+    }
+
+    .wr__item.wr__item--percent {
+      font-size: 16px;
+      padding: 30px 0 20px;
+    }
+
+    .wr__title {
+      font-size: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="wr">
+      <div class="wr__wrapper">
+        <div class="wr__item">
+          <div class="wr__score wr__score--wins">0</div>
+          <div class="wr__title">W</div>
+        </div>
+        <div class="wr__item wr__item--rank">
+          <div class="wr-rank__item wr-rank__item--img">
+            <img class="wr-rank__img" src="/imgs/divisions/0.png">
+          </div>
+          <div class="wr-rank__item wr-rank__item--tp"></div>
+        </div>
+        <div class="wr__item wr__item--losses">
+          <div class="wr__score wr__score--losses">0</div>
+          <div class="wr__title">L</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const getData = async () => {
+        let res = await fetch('/winrate?token=<%= token %>')
+        let data = await res.json()
+        return data.data
+      }
+
+      const $wins = document.querySelector('.wr__score--wins'),
+        $losses = document.querySelector('.wr__score--losses'),
+        $percent = document.querySelector('.wr__item--percent'),
+        $img = document.querySelector('.wr-rank__img'),
+        $tp = document.querySelector('.wr-rank__item--tp')
+      
+      const fetchData = async () => {
+        try {
+          let data = await getData()
+          $wins.innerHTML = data.Wins
+          $losses.innerHTML = data.Losses
+          $img.src = `/imgs/divisions/${data.tier}.png`
+          $tp.innerHTML = `${data.tp} TP`
+          //let percent = Math.round((data.Wins / (data.Wins + data.Losses)) * 100).toFixed(1)
+          //$percent.innerHTML = isNaN(percent) ? '' : percent + '%'
+        } catch (e) {
+          console.log(e)
+        }
+      }
+      
+      fetchData()
+      setInterval(fetchData, 60000)
+    })
+  </script>
+</body>
+
+</html>
