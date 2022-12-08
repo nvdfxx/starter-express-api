@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "set DEV_ID=3410&&set AUTH_KEY=8968E309727C4B39862C0D9168EE0990&&nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/cyclic-software/starter-express-api#readme",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "express": "^4.17.1",
     "md5": "^2.2.1",
-    "moment": "^2.17.1"
+    "moment": "^2.17.1",
+    "mongoose": "^6.8.0"
   }
 }

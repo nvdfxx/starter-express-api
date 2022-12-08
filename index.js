@@ -1,5 +1,9 @@
 const express = require('express')
 const path = require('path')
+const mongoose = require('mongoose')
+require('dotenv').config()
+
+
 const app = express()
 
 app.set('view engine', 'ejs');
@@ -24,4 +28,15 @@ app.get('/winrate', winrateController)
 //     res.send(s)
 // })
 
-app.listen(process.env.PORT || 3000, () => console.log('started'))
+let port = process.env.PORT || 3000
+
+const serve = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URL);
+    app.listen(port, () => console.log('server started'));
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+serve()
