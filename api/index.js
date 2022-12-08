@@ -1,5 +1,6 @@
 const moment = require("moment");
 const md5 = require("md5");
+const fetch = require('node-fetch')
 
 const Ranks = {
     Qualifying: 0,
