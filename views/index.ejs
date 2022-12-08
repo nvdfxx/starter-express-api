@@ -187,17 +187,17 @@
           {
             name: "StreamElements: Reset session",
             query:
-              "${customapi.<%= host %>/widget?token=[token]&restart=${queryescape ${1:|'yes'}}}",
+              "${customapi.<%= host %>/widget?token=[token]&restart=yes}",
           },
           {
             name: "StreamElements: Rank",
             query:
-              "${customapi.<%= host %>/rank?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}}",
+              "${customapi.<%= host %>/rank?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}",
           },
           {
             name: "StreamElements: Current match",
             query:
-              "${customapi.<%= host %>/cm?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}}",
+              "${customapi.<%= host %>/cm?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}",
           },
         ];
 
