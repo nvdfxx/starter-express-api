@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Paladins Stream Helper</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Ubuntu", sans-serif;
+        background: rgb(3, 0, 26);
+        color: rgb(184, 184, 184);
+      }
+
+      h1 {
+        margin: 0 0 40px;
+        font-size: 40px;
+      }
+
+      .app__wrapper {
+        padding: 50px 15px;
+        height: 100vh;
+        overflow: auto;
+        display: flex;
+        align-items: center;
+      }
+
+      .app__inner {
+        flex: auto;
+      }
+
+      .cont {
+        max-width: 1280px;
+        margin: auto;
+      }
+
+      .fields {
+        display: flex;
+        margin-bottom: 50px;
+      }
+
+      .field {
+        margin-right: 15px;
+      }
+
+      .field__title {
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .field__input {
+        height: auto;
+        font-size: 16px;
+        border: 1px solid rgb(184, 184, 184);
+        outline: none;
+        background: rgb(255 255 255 / 16%);
+        padding: 10px;
+        border-radius: 10px;
+        color: #fff;
+      }
+
+      .command {
+        margin-bottom: 30px;
+        font-size: 20px;
+      }
+
+      .command__title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .command__main {
+        display: flex;
+        align-items: center;
+      }
+
+      .command__copy-btn {
+        height: 44px;
+        margin-right: 10px;
+        background: rgb(13 0 117);
+        border: none;
+        transition: 0.2s;
+        outline: none;
+        cursor: pointer;
+        width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 10px;
+      }
+
+      .command__copy-btn:hover,
+      .command__copy-btn:focus {
+        background: rgb(255 255 255 / 16%);
+      }
+
+      .command__copy-btn svg {
+        fill: rgb(184, 184, 184);
+        width: 25px;
+      }
+
+      .command__query {
+        background: rgb(255 255 255 / 16%);
+        padding: 10px;
+        border-radius: 10px;
+        flex: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section class="app">
+      <div id="app">
+        <div class="cont">
+          <div class="app__wrapper">
+            <div class="app__inner">
+              <h1>Paladins Stream Helper v2</h1>
+              <div class="fields">
+                <div class="field">
+                  <div class="field__title">Enter your token</div>
+                  <input class="field__input" type="text" v-model="token" />
+                </div>
+                <div class="field">
+                  <div class="field__title">Enter your nickname</div>
+                  <input class="field__input" type="text" v-model="nickname" />
+                </div>
+              </div>
+              <div class="commands">
+                <div
+                  class="command"
+                  v-for="command in commands"
+                  :key="command.name"
+                >
+                  <div class="command__title">{{ command.name }}</div>
+                  <div class="command__main">
+                    <div class="command__copy">
+                      <button
+                        class="command__copy-btn"
+                        @click.stop="copyToClipBoard(command.query)"
+                        title="copy"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="48"
+                          height="48"
+                          viewBox="0 0 48 48"
+                        >
+                          <path fill="none" d="M0 0h48v48H0z" />
+                          <path
+                            d="M32 2H8C5.79 2 4 3.79 4 6v28h4V6h24V2zm6 8H16c-2.21 0-4 1.79-4 4v28c0 2.21 1.79 4 4 4h22c2.21 0 4-1.79 4-4V14c0-2.21-1.79-4-4-4zm0 32H16V14h22v28z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="command__query">
+                      {{ command.query }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const commandsList = [
+          {
+            name: "OBS: Widget",
+            query: "${customapi.<%= host %>/widget?token=[token]",
+          },
+          {
+            name: "StreamElements: Reset session",
+            query:
+              "${customapi.<%= host %>/widget?token=[token]&restart=${queryescape ${1:|'yes'}}}",
+          },
+          {
+            name: "StreamElements: Rank",
+            query:
+              "${customapi.<%= host %>/rank?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}}",
+          },
+          {
+            name: "StreamElements: Current match",
+            query:
+              "${customapi.<%= host %>/cm?query=${queryescape ${1:|'[nickname]'}}&player=[nickname]}}",
+          },
+        ];
+
+        const App = new Vue({
+          el: "#app",
+          data: () => ({
+            token: "",
+            nickname: "",
+            commandsList,
+          }),
+          computed: {
+            commands() {
+              const list = this.commandsList.map((e) => ({
+                query: e.query
+                  .replaceAll("[nickname]", this.nickname)
+                  .replaceAll("[token]", this.token),
+                name: e.name,
+              }));
+              return list;
+            },
+          },
+          methods: {
+            copyToClipBoard(textToCopy) {
+              navigator.clipboard.writeText(textToCopy);
+            },
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

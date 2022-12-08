@@ -1,8 +1,10 @@
-const User = require('../utils/user')
+//const User = require('../utils/user')
+const User = require('../models/User')
 
 module.exports.widgetController = async function (req, res) {
     try {
-        let user = User.findByToken(req.query.token)
+        //let user = User.findByToken(req.query.token)
+        let user = await User.findOne({ token: req.query.token })
         console.log(user)
         if (user) {
             if (req.query.restart) {
@@ -16,6 +18,7 @@ module.exports.widgetController = async function (req, res) {
                     }
                 }
                 user.date = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
+                await user.save()
                 return res.send('Your session was restarted')
             }
             return res.render('widget', { token: req.query.token })

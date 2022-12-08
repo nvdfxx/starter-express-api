@@ -10,16 +10,21 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/', (req, res) => {
-    console.log("Just got a request!")
-    res.send('Yo2!')
-})
-
+const {indexController} = require('./controllers/indexController')
 const {widgetController} = require('./controllers/widgetController')
 const {winrateController} = require('./controllers/winrateController')
+const {eloController} = require('./controllers/eloController')
+const {currentMatchController} = require('./controllers/currentMatchController')
+const {allUsers, create} = require('./controllers/usersController')
+
+app.get('/', indexController)
 
 app.get('/widget', widgetController)
 app.get('/winrate', winrateController)
+app.get('/cm', currentMatchController)
+app.get('/rank', eloController)
+app.get('/users', allUsers)
+app.get('/users/create', create)
 
 // const {getPlayer, getPlayerMatchHistory} = require('./api');
 

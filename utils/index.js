@@ -10,3 +10,12 @@ module.exports.filter = (a,f,g) => {
     }
     return filtered
 }
+
+module.exports.getToken = (length) => {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  for (var i = 0; i < length; i++) {
+    text += possible[Math.floor(Math.random() * possible.length)];
+  }
+  return text;
+}

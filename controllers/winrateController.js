@@ -1,10 +1,12 @@
-const User = require('../utils/user')
-const {getPlayer, getPlayerMatchHistory, Ranks} = require('../api');
-const {filter} = require('../utils')
+//const User = require('../utils/user')
+const User = require('../models/User')
+const {getPlayer, getPlayerMatchHistory} = require('../api');
+//const {filter} = require('../utils')
 
 module.exports.winrateController = async function(req, res) {
   try {
-    let user = User.findByToken(req.query.token)
+    //let user = User.findByToken(req.query.token)
+    let user = await User.findOne({ token: req.query.token })
     console.log(user)
     if(user) {
       let player = await getPlayer(user.nickname)

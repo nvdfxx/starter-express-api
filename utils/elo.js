@@ -1,7 +1,11 @@
+const {Ranks} = require('../api')
+
 const WRDelta = (wr) => {
     const WRDeltas = [-2, -1, 0, 1, 2]
     const WRRanges = [[0, 19], [20, 48], [49, 59], [60, 80], [81, 100]]
     let r = WRRanges.findIndex(e => wr >= e[0] && wr <= e[1])
+    const res = wr > 51 ? wr : wr * -1
+    return res
     return WRDeltas[r]
 }
 
@@ -9,6 +13,8 @@ const KDDelta = (kd) => {
     const KDDeltas = [-3, -2, -1, 0, 1, 2, 3]
     const KDRanges = [[0, 0.49], [0.5, 0.69], [0.7, 0.89], [0.9, 1.29], [1.3, 1.99], [2, 2.99], [3, 20]]
     let r = KDRanges.findIndex(e => kd >= e[0] && kd <= e[1])
+    const res = kd > 1.3 ? kd : kd * -1
+    return res
     return KDDeltas[r]
 }
 
@@ -31,12 +37,12 @@ function randomIntFromInterval(min, max) {
 }
 
 const EloDelta = data => {
-    let d = data.tier * 100 + KDDelta(data.kd) * 100 + WRDelta(data.wr) * 100 + randomIntFromInterval(1, 50) * (Math.random() > 0.5 ? 1 : -1)
+    let d = data.tier * 100 + KDDelta(data.kd) * 100 + WRDelta(data.wr) //+ randomIntFromInterval(1, 50) * (Math.random() > 0.5 ? 1 : -1)
     return d
 }
 
 function elo(tier, matches) {
-    let ranked = matches.filter(e => e.Queue == 'Ranked')
+    let ranked = matches
     if (ranked.length < 10) {
         return `Для рассчета ELO требуется сыграть минимум 10 игр 
         в рейтинговом режиме за последние 50 игр`
@@ -55,8 +61,9 @@ function elo(tier, matches) {
         tier,
         count: ranked.length
     }
-    console.log(m)
-    return EloDelta(m)
+    //console.log(m)
+    const elo = EloDelta(m)
+    return {rank: Object.keys(Ranks)[m.tier].replace('_', ' '), elo, defaultElo: Number(tier) * 100}
     //return TierDelta(RankDelta(m))
 }
 

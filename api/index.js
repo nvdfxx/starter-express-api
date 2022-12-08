@@ -46,15 +46,27 @@ function getSignature(method) {
 
 let SESSION_ID = null
 
-async function getSession() {
-    if(!SESSION_ID) {
+async function createSession() {
+    try {
         const url = `${URL}/createsessionJson/${process.env.DEV_ID}/${getSignature('createsession')}/${timeStamp()}`
         const res = await fetch(url)
         const parsed = await res.json()
-        //console.log(parsed)
         SESSION_ID = parsed.session_id
+    } catch(e) {
+        console.log(e)
     }
-    return SESSION_ID
+}
+
+async function getSession() {
+    try {
+        if(!SESSION_ID) {
+            console.log('no session')
+            await createSession()
+        }
+        return SESSION_ID
+    } catch(e) {
+        console.log(e)
+    }
 }
 
 async function getPlayer(nickname) {
@@ -65,6 +77,7 @@ async function getPlayer(nickname) {
         const parsed = await res.json()
         return parsed[0]
     } catch (error) {
+        SESSION_ID = null
         console.log(error)
     }
 }
@@ -82,6 +95,35 @@ async function getPlayerMatchHistory(id) {
         })
         return sanitized
     } catch (error) {
+        SESSION_ID = null
+        console.log(error)
+    }
+}
+
+async function getPlayerStatus(id) {
+    try {
+        const session_id = await getSession()
+        //console.log(player)
+        const url = `${URL}/getplayerstatusJson/${process.env.DEV_ID}/${getSignature('getplayerstatus')}/${session_id}/${timeStamp()}/${id}`
+        const res = await fetch(url)
+        const parsed = await res.json()
+        return parsed[0]
+    } catch (error) {
+        SESSION_ID = null
+        console.log(error)
+    }
+}
+
+async function getActiveMatchDetails(id) {
+    try {
+        const session_id = await getSession()
+        //console.log(player)
+        const url = `${URL}/getmatchplayerdetailsJson/${process.env.DEV_ID}/${getSignature('getmatchplayerdetails')}/${session_id}/${timeStamp()}/${id}`
+        const res = await fetch(url)
+        const parsed = await res.json()
+        return parsed
+    } catch (error) {
+        SESSION_ID = null
         console.log(error)
     }
 }
@@ -89,5 +131,7 @@ async function getPlayerMatchHistory(id) {
 module.exports = {
     getPlayer,
     getPlayerMatchHistory,
+    getActiveMatchDetails,
+    getPlayerStatus,
     Ranks
 }
