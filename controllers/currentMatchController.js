@@ -17,6 +17,6 @@ module.exports.currentMatchController = async function(req, res) {
         }
     } catch(e) {
         console.log(e)
-        return res.send('Error: Something went wrong. NotLikeThis')
+        return res.send('Error: Something went wrong.')
     }
 }

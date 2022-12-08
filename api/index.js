@@ -73,9 +73,13 @@ async function getSession() {
 async function getPlayer(nickname) {
     try {
         const session_id = await getSession()
-        const url = `${URL}/getplayerjson/${process.env.DEV_ID}/${getSignature('getplayer')}/${session_id}/${timeStamp()}/${nickname}`
+        const url = `${URL}/getplayerJson/${process.env.DEV_ID}/${getSignature('getplayer')}/${session_id}/${timeStamp()}/${nickname}`
         const res = await fetch(url)
         const parsed = await res.json()
+        if(parsed[0].ret_msg == 'Invalid session id.') {
+            SESSION_ID = null
+            return getPlayer(nickname)
+        }
         return parsed[0]
     } catch (error) {
         SESSION_ID = null
@@ -87,9 +91,13 @@ async function getPlayerMatchHistory(id) {
     try {
         const session_id = await getSession()
         //console.log(player)
-        const url = `${URL}/getmatchhistoryjson/${process.env.DEV_ID}/${getSignature('getmatchhistory')}/${session_id}/${timeStamp()}/${id}`
+        const url = `${URL}/getmatchhistoryJson/${process.env.DEV_ID}/${getSignature('getmatchhistory')}/${session_id}/${timeStamp()}/${id}`
         const res = await fetch(url)
         const parsed = await res.json()
+        if(parsed[0].ret_msg == 'Invalid session id.') {
+            SESSION_ID = null
+            return getPlayerMatchHistory(id)
+        }
         const sanitized = parsed.filter(e => e.Queue == 'Ranked').map(e => {
             const {Kills, Deaths, Win_Status, Assists, Match_Time} = e 
             return {Kills, Deaths, Win_Status, Assists, Match_Time}
@@ -108,6 +116,10 @@ async function getPlayerStatus(id) {
         const url = `${URL}/getplayerstatusJson/${process.env.DEV_ID}/${getSignature('getplayerstatus')}/${session_id}/${timeStamp()}/${id}`
         const res = await fetch(url)
         const parsed = await res.json()
+        if(parsed[0].ret_msg == 'Invalid session id.') {
+            SESSION_ID = null
+            return getPlayerStatus(id)
+        }
         return parsed[0]
     } catch (error) {
         SESSION_ID = null
@@ -122,6 +134,10 @@ async function getActiveMatchDetails(id) {
         const url = `${URL}/getmatchplayerdetailsJson/${process.env.DEV_ID}/${getSignature('getmatchplayerdetails')}/${session_id}/${timeStamp()}/${id}`
         const res = await fetch(url)
         const parsed = await res.json()
+        if(parsed.ret_msg == 'Invalid session id.') {
+            SESSION_ID = null
+            return getActiveMatchDetails(id)
+        }
         return parsed
     } catch (error) {
         SESSION_ID = null

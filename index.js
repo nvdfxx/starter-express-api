@@ -15,10 +15,11 @@ const {widgetController} = require('./controllers/widgetController')
 const {winrateController} = require('./controllers/winrateController')
 const {eloController} = require('./controllers/eloController')
 const {currentMatchController} = require('./controllers/currentMatchController')
+const {deckController} = require('./controllers/deckController')
 const {allUsers, create} = require('./controllers/usersController')
 
 app.get('/', indexController)
-
+app.get('/deck', deckController)
 app.get('/widget', widgetController)
 app.get('/winrate', winrateController)
 app.get('/cm', currentMatchController)
