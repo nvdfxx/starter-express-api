@@ -2,6 +2,7 @@ const User =  require('../models/User')
 
 module.exports.allUsers = async function(req, res) {
     try {
+      if(req.query.pw != process.env.ADMIN_PW) return res.send('incorrect pw')
       let users = await User.find({})
       //console.log(users)
       return res.send(users)
@@ -12,6 +13,8 @@ module.exports.allUsers = async function(req, res) {
 
 module.exports.create = async function(req, res) {
     try {
+      if(req.query.pw != process.env.ADMIN_PW) return res.send('incorrect pw')
+      if(!req.query.nickname) return res.send('incorrect nickname')
       let user = new User({
           nickname: req.query.nickname
       })
